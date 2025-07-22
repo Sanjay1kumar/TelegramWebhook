@@ -4,14 +4,14 @@ const app = express();
 
 app.use(express.json());
 
-const TELEGRAM_BOT_TOKEN = '7549463850:AAED8KKkbO6htk0aqJi_eCLVGYpppce1Yyk'; // Replace with your bot token
-const SALESFORCE_ENDPOINT = 'https://kristhunandusahodarulusahavasam--sanjay.cs88.force.com/services/apexrest/SaveTelegramChatId'; // Replace with your Site URL
+// 🔧 Replace with your actual values:
+const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // <-- replace
+const SALESFORCE_ENDPOINT = 'https://YOUR_SITE.force.com/services/apexrest/SaveTelegramChatId'; // <-- replace
+const SECRET_KEY = 'MySecret123'; // must match Apex class
 
-const SECRET_KEY = 'MySecret123'; // Must match the Apex class secret
-
+// 📬 Telegram webhook endpoint
 app.post('/webhook', async (req, res) => {
     const msg = req.body.message;
-
     console.log('Received Telegram message:', JSON.stringify(req.body));
 
     if (msg && msg.chat && msg.from) {
@@ -19,20 +19,27 @@ app.post('/webhook', async (req, res) => {
         const name = msg.from.first_name || '';
         const phone = msg.contact ? msg.contact.phone_number : null;
 
+        // ❌ If phone is not shared yet, ask user to send it
         if (!phone) {
-            console.log('No phone number received — user must share contact.');
+            console.log('No phone number — asking user to share contact');
             await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 chat_id: chatId,
-                text: `Hi ${name}, please share your phone number using the Telegram contact button to connect your account.`
+                text: `Hi ${name}, please share your phone number to connect your account.`,
+                reply_markup: {
+                    keyboard: [[{
+                        text: "📱 Share My Phone Number",
+                        request_contact: true
+                    }]],
+                    one_time_keyboard: true,
+                    resize_keyboard: true
+                }
             });
             return res.sendStatus(200);
         }
 
+        // ✅ User shared phone number — send to Salesforce
         try {
-            // Log before sending
-            console.log('Sending to Salesforce:', {
-                phone, chatId, name
-            });
+            console.log('Sending to Salesforce:', { phone, chatId, name });
 
             const response = await axios.post(SALESFORCE_ENDPOINT, {
                 phone: phone,
@@ -49,7 +56,7 @@ app.post('/webhook', async (req, res) => {
             });
 
         } catch (error) {
-            console.error('Error sending to Salesforce:', error.response?.data || error.message);
+            console.error('Salesforce sync failed:', error.response?.data || error.message);
 
             await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 chat_id: chatId,
@@ -61,10 +68,12 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
+// ✅ Optional homepage
 app.get('/', (req, res) => {
-    res.send('Telegram Webhook Server is running ✅');
+    res.send('✅ Telegram Webhook Server is live');
 });
 
+// 🚀 Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Telegram webhook server running on port ${PORT}`);
