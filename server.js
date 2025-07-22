@@ -6,7 +6,6 @@ app.use(express.json());
 
 const TELEGRAM_BOT_TOKEN = '7549463850:AAED8KKkbO6htk0aqJi_eCLVGYpppce1Yyk';
 const SALESFORCE_ENDPOINT = 'https://kristhunandusahodarulusahavasam--sanjay.sandbox.my.salesforce.com/services/apexrest/SaveTelegramChatId';
-
 app.post('/webhook', async (req, res) => {
     const msg = req.body.message;
 
