@@ -5,6 +5,7 @@ const app = express();
 app.use(express.json());
 
 const SF_LOGIN_URL = 'https://test.salesforce.com'; 
+const CLIENT_ID = '3MVG9dAEux2v1sLs.EoklfvcvXUV0um4mEXUQ7dVGkmjBs4yRriBtKecJ1RtDw8VB0OdTCwFIVjhmEWZ2Jwqc';
 const CLIENT_SECRET = '953DC3CF45C3CEE081B6CA5E4792A69A8B3AFE094BD96F0A368F1CE3FF14BCAE';
 const SF_USERNAME = 'stylishmidde9618624@agentforce.com';
 const SF_PASSWORD = 'Sanjaykumar@123' + 'fGh8lnM8VepmpN8W20pLzEyk';
