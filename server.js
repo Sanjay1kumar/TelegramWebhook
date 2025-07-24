@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json());
 
 // ✅ Use your Salesforce Public Site URL — NOT lightning.force.com
-const SALESFORCE_ENDPOINT = 'https://kristhunandusahodarulusahavasam--sanjay.sandbox.my.site.com/services/apexrest/SaveTelegramChatId';
+const SALESFORCE_ENDPOINT = 'https://kristhunandusahodarulusahavasam--sanjay.sandbox.my.site.com/BICFD/services/apexrest/SaveTelegramChatId';
 const SECRET_KEY = 'MySecret123'; // Must match in Apex
 
 app.post('/webhook', async (req, res) => {
