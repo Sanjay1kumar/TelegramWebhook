@@ -1,11 +1,11 @@
-// telegramWebhook.js
 const express = require('express');
 const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-const SALESFORCE_ENDPOINT = 'https://kristhunandusahodarulusahavasam--sanjay.sandbox.lightning.force.com/services/apexrest/SaveTelegramChatId'; // Your Apex REST
-const SECRET_KEY = 'MySecret123'; // Use same in Apex class
+// ✅ Use your Salesforce Public Site URL — NOT lightning.force.com
+const SALESFORCE_ENDPOINT = 'https://kristhunandusahodarulusahavasam--sanjay.sandbox.my.site.com/services/apexrest/SaveTelegramChatId';
+const SECRET_KEY = 'MySecret123'; // Must match in Apex
 
 app.post('/webhook', async (req, res) => {
     const message = req.body.message;
@@ -17,21 +17,27 @@ app.post('/webhook', async (req, res) => {
     const lastName = message.chat.last_name || '';
 
     try {
-        await axios.post(SALESFORCE_ENDPOINT, {
+        const response = await axios.post(SALESFORCE_ENDPOINT, {
             chatId,
             username,
             firstName,
             lastName,
             secret: SECRET_KEY
         });
+
+        console.log('Salesforce response:', response.data);
         res.sendStatus(200);
     } catch (error) {
-        console.error('Error sending to Salesforce:', error.message);
+        if (error.response) {
+            console.error('Salesforce Error:', error.response.status, error.response.data);
+        } else {
+            console.error('Unknown Error:', error.message);
+        }
         res.sendStatus(500);
     }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+    console.log(`🚀 Telegram webhook server running on port ${PORT}`);
 });
